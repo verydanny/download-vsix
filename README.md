@@ -1,5 +1,5 @@
 # Download .vsix
-Simple browser extension adding a page action to download .vsix files from the Visual Studio Marketplace. The `activeTab` permission is required to parse the URL and page HTML, for generating a correct download link.
+Simple browser extension adding a page action to download .vsix files from the Visual Studio Marketplace. The `activeTab` permission is required to parse the URL, for generating a correct download link.
 
 Now with support for downloading older versions!
 
