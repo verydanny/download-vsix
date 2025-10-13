@@ -1,0 +1,15 @@
+body {
+    font-family: sans-serif;
+    background-color: rgb(0, 16, 51);
+    color: rgb(220, 231, 255);
+}
+
+a {
+    color: rgb(147, 181, 255);
+}
+
+table, td, th {
+    border: 1px solid rgb(220, 231, 255);
+    border-collapse: collapse;
+    padding: 4px 8px;
+}
