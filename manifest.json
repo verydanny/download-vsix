@@ -3,7 +3,7 @@
   "description": "Download button for .vsix files from the Visual Studio Marketplace.",
   "manifest_version": 2,
   "name": "Download .vsix",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "homepage_url": "https://github.com/verydanny/download-vsix",
   "icons": {
     "48": "icons/dl-vsix-48.png"
@@ -28,5 +28,4 @@
     "activeTab",
     "storage"
   ]
-
 }

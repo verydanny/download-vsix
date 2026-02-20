@@ -1,9 +1,9 @@
 {
   "name": "download-vsix-firefox",
   "private": true,
-  "version": "1.3.1",
+  "version": "1.3.2",
   "dependencies": {
-    "lightua": "latest"
+    "lightua": "^0.1.0"
   },
   "webExt": {
     "ignoreFiles": ["src/", "node_modules/", "bun.lock", "tsconfig.json", ".DS_Store"]
@@ -16,5 +16,9 @@
     "pack": "bun run build && bunx web-ext build --overwrite-dest",
     "sign:listed": "bun run build && set -a && . ./.env && set +a && bunx web-ext sign --channel listed --amo-metadata ./amo-metadata.json --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\"",
     "sign:unlisted": "bun run build && set -a && . ./.env && set +a && bunx web-ext sign --channel unlisted --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\""
-  }
+  },
+   "engines": {
+    "bun": "1.3.9"
+   },
+   "packageManager": "bun@1.3.9"
 }
