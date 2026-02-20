@@ -5,7 +5,7 @@
   "name": "Download .vsix",
   "version": "1.1.1",
   "license": "MIT",
-  "homepage_url": "https://github.com/ShadowCube264/download-vsix",
+  "homepage_url": "https://github.com/verydanny/download-vsix",
   "icons": {
     "48": "icons/dl-vsix-48.png"
   },
