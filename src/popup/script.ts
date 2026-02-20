@@ -43,15 +43,39 @@ const OS_PREFIX_MAP: Record<string, string> = {
     ChromeOS: "linux",
 };
 
+function detectArch(osPrefix: string): "arm64" | "x64" {
+    const uad = (navigator as any).userAgentData;
+    if (uad?.architecture) {
+        return /arm/i.test(uad.architecture) ? "arm64" : "x64";
+    }
+
+    const ua = navigator.userAgent;
+    if (/aarch64|arm64/i.test(ua)) return "arm64";
+    if (/WOW64|Win64|x86_64|x86-64|x64/i.test(ua)) return "x64";
+
+    if (osPrefix === "darwin") {
+        try {
+            const canvas = document.createElement("canvas");
+            const gl = canvas.getContext("webgl");
+            if (gl) {
+                const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+                if (dbg) {
+                    const renderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) as string;
+                    if (/Apple M\d|Apple GPU/i.test(renderer)) return "arm64";
+                }
+            }
+        } catch {}
+    }
+
+    return "x64";
+}
+
 function detectPlatform(): string {
     const ua = UserAgent.parse(navigator.userAgent);
     const prefix = OS_PREFIX_MAP[ua.os.name];
     if (!prefix) return AUTO_PLATFORM_VALUE;
 
-    const uad = (navigator as any).userAgentData;
-    const arch = uad?.architecture || "";
-    const suffix = /arm/i.test(arch) ? "arm64" : "x64";
-
+    const suffix = detectArch(prefix);
     return `${prefix}-${suffix}`;
 }
 
