@@ -27,7 +27,9 @@ Commands:
 2. Put credentials in `.env`:
    - `AMO_API_KEY=your-jwt-issuer`
    - `AMO_API_SECRET=your-jwt-secret`
-3. Sign and submit listed:
+3. Ensure `amo-metadata.json` contains at least:
+   - `version.license` (currently set to `MIT` in this repo)
+4. Sign and submit listed:
    - `npm run sign:listed`
 
 Notes for this fork:
