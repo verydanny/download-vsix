@@ -21,3 +21,18 @@ table, td, th {
     border-collapse: collapse;
     padding: 4px 8px;
 }
+
+#showMoreBtn {
+    margin-top: 8px;
+    padding: 4px 12px;
+    background: rgb(40, 60, 110);
+    color: rgb(220, 231, 255);
+    border: 1px solid rgb(100, 130, 200);
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+#showMoreBtn:hover {
+    background: rgb(60, 80, 140);
+}

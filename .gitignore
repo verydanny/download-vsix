@@ -1,2 +1,5 @@
 web-ext-artifacts/*
 .env
+.DS_Store
+node_modules/
+popup/script.js

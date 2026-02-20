@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "download-vsix-firefox",
+      "dependencies": {
+        "lightua": "latest",
+      },
+    },
+  },
+  "packages": {
+    "lightua": ["lightua@0.1.0", "", {}, "sha512-7H3DxfyPA4EOyYoiNNNPGqIKaDT2jlsPG0Ocs1xjbJaX/M4Dt/aBJbYxOgrf+BUnAEnb4b4cQggoWb2EnC+nqQ=="],
+  }
+}
