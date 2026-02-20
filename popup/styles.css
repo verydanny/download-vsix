@@ -4,6 +4,14 @@ body {
     color: rgb(220, 231, 255);
 }
 
+#platformPicker {
+    margin-bottom: 8px;
+}
+
+#platformPicker label {
+    margin-right: 8px;
+}
+
 a {
     color: rgb(147, 181, 255);
 }

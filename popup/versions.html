@@ -4,6 +4,18 @@
     <script src="script.js"></script>
 </head>
 <body>
+    <div id="platformPicker">
+        <label for="platformSelect">Platform</label>
+        <select id="platformSelect">
+            <option value="universal">Auto / Universal</option>
+            <option value="darwin-x64">macOS (Intel) - darwin-x64</option>
+            <option value="darwin-arm64">macOS (Apple Silicon) - darwin-arm64</option>
+            <option value="linux-x64">Linux (x64) - linux-x64</option>
+            <option value="linux-arm64">Linux (ARM64) - linux-arm64</option>
+            <option value="win32-x64">Windows (x64) - win32-x64</option>
+            <option value="win32-arm64">Windows (ARM64) - win32-arm64</option>
+        </select>
+    </div>
     <table id="versionTbl">
         <tr>
             <th>Version</th>

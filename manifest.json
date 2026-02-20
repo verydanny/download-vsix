@@ -15,9 +15,18 @@
     "show_matches": ["https://marketplace.visualstudio.com/items?*"],
     "default_popup": "popup/versions.html"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "download-vsix@danii.local",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
 
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ]
 
 }
