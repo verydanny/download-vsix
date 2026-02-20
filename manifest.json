@@ -4,6 +4,7 @@
   "manifest_version": 2,
   "name": "Download .vsix",
   "version": "1.1",
+  "license": "MIT",
   "homepage_url": "https://github.com/ShadowCube264/download-vsix",
   "icons": {
     "48": "icons/dl-vsix-48.png"
