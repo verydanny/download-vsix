@@ -1,7 +1,7 @@
 {
   "name": "download-vsix-firefox",
   "private": true,
-  "version": "1.2",
+  "version": "1.2.1",
   "dependencies": {
     "lightua": "latest"
   },
@@ -13,7 +13,8 @@
     "build": "bun build src/popup/script.ts --outdir popup --target=browser --format=iife",
     "ext": "bunx web-ext run --firefox=/Applications/Firefox.app/Contents/MacOS/firefox",
     "lint": "bunx web-ext lint",
-    "sign:listed": "set -a && . ./.env && set +a && bunx web-ext sign --channel listed --amo-metadata ./amo-metadata.json --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\"",
-    "sign:unlisted": "set -a && . ./.env && set +a && bunx web-ext sign --channel unlisted --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\""
+    "pack": "bun run build && bunx web-ext build --overwrite-dest",
+    "sign:listed": "bun run build && bunx web-ext sign --channel listed --amo-metadata ./amo-metadata.json --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\"",
+    "sign:unlisted": "bun run build && bunx web-ext sign --channel unlisted --api-key \"$AMO_API_KEY\" --api-secret \"$AMO_API_SECRET\""
   }
 }

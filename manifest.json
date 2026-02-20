@@ -3,8 +3,7 @@
   "description": "Download button for .vsix files from the Visual Studio Marketplace.",
   "manifest_version": 2,
   "name": "Download .vsix",
-  "version": "1.2",
-  "license": "MIT",
+  "version": "1.2.1",
   "homepage_url": "https://github.com/verydanny/download-vsix",
   "icons": {
     "48": "icons/dl-vsix-48.png"
