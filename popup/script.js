@@ -138,12 +138,23 @@
   var PLATFORM_STORAGE_KEY = "selectedPlatform";
   var AUTO_PLATFORM_VALUE = "universal";
   var PAGE_SIZE = 20;
+  var PLATFORM_LABELS = {
+    "darwin-x64": "macOS (Intel)",
+    "darwin-arm64": "macOS (Apple Silicon)",
+    "linux-x64": "Linux (x64)",
+    "linux-arm64": "Linux (ARM64)",
+    "win32-x64": "Windows (x64)",
+    "win32-arm64": "Windows (ARM64)"
+  };
+  var platformPicker = document.getElementById("platformPicker");
   var platformSelect = document.getElementById("platformSelect");
   var table = document.getElementById("versionTbl");
   var tableHeaderRows = 1;
   var selectedPlatform = AUTO_PLATFORM_VALUE;
   var extensionMeta = null;
   var releaseRows = [];
+  var availablePlatforms = [];
+  var hasPlatformSpecificBuilds = false;
   var displayedCount = 0;
   var OS_PREFIX_MAP = {
     macOS: "darwin",
@@ -206,18 +217,37 @@
   function resolvedPlatform() {
     return selectedPlatform === AUTO_PLATFORM_VALUE ? detectPlatform() : selectedPlatform;
   }
-  function buildDownloadUrl(author, packageName, version) {
-    const downloadUrl = new URL(`https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${packageName}/${version}/vspackage`);
-    const platform = resolvedPlatform();
-    if (platform !== AUTO_PLATFORM_VALUE) {
+  function buildDownloadUrl(author, packageName, release) {
+    const downloadUrl = new URL(`https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${author}/vsextensions/${packageName}/${release.version}/vspackage`);
+    if (hasPlatformSpecificBuilds && release.targetPlatform && availablePlatforms.includes(release.targetPlatform)) {
+      const platform = release.targetPlatform;
       downloadUrl.searchParams.set("targetPlatform", platform);
     }
     return downloadUrl.toString();
   }
+  function getPlatformValues(versions) {
+    const seen = new Set;
+    const values = [];
+    for (const version of versions) {
+      const platform = version.targetPlatform?.trim();
+      if (!platform || seen.has(platform))
+        continue;
+      seen.add(platform);
+      values.push(platform);
+    }
+    return values;
+  }
+  function getVisibleReleaseRows() {
+    if (!hasPlatformSpecificBuilds)
+      return releaseRows;
+    if (!selectedPlatform || !availablePlatforms.includes(selectedPlatform))
+      return [];
+    return releaseRows.filter((release) => release.targetPlatform === selectedPlatform);
+  }
   function getUniqueVersions() {
     const seen = new Set;
     const result = [];
-    for (const release of releaseRows) {
+    for (const release of getVisibleReleaseRows()) {
       if (!seen.has(release.version)) {
         seen.add(release.version);
         result.push(release);
@@ -236,7 +266,7 @@
       const row = document.createElement("tr");
       const versionCell = document.createElement("td");
       const link = document.createElement("a");
-      link.href = buildDownloadUrl(author, packageName, release.version);
+      link.href = buildDownloadUrl(author, packageName, release);
       link.textContent = release.version;
       versionCell.append(link);
       row.append(versionCell);
@@ -283,22 +313,64 @@
     const storage = await browser.storage.local.get(PLATFORM_STORAGE_KEY);
     return storage[PLATFORM_STORAGE_KEY] || "";
   }
-  async function setupPlatformPicker() {
+  function formatPlatformLabel(platform) {
+    const friendly = PLATFORM_LABELS[platform];
+    return friendly ? `${friendly} - ${platform}` : platform;
+  }
+  function syncPlatformPickerVisibility() {
+    platformPicker.hidden = !hasPlatformSpecificBuilds;
+  }
+  function populatePlatformPickerOptions() {
+    platformSelect.replaceChildren();
+    for (const platform of availablePlatforms) {
+      const option = document.createElement("option");
+      option.value = platform;
+      option.textContent = formatPlatformLabel(platform);
+      platformSelect.append(option);
+    }
+  }
+  async function syncPlatformSelection() {
+    if (!hasPlatformSpecificBuilds || availablePlatforms.length === 0)
+      return;
     const stored = await loadSavedPlatform();
-    if (stored && [...platformSelect.options].some((o) => o.value === stored)) {
+    const detected = resolvedPlatform();
+    if (stored && availablePlatforms.includes(stored)) {
       selectedPlatform = stored;
+    } else if (availablePlatforms.includes(detected)) {
+      selectedPlatform = detected;
     } else {
-      selectedPlatform = detectPlatform();
+      selectedPlatform = availablePlatforms[0] || AUTO_PLATFORM_VALUE;
     }
     platformSelect.value = selectedPlatform;
+  }
+  async function setupPlatformPicker() {
+    hasPlatformSpecificBuilds = releaseRows.some((release) => Boolean(release.targetPlatform));
+    availablePlatforms = hasPlatformSpecificBuilds ? getPlatformValues(releaseRows) : [];
+    syncPlatformPickerVisibility();
+    if (!hasPlatformSpecificBuilds) {
+      selectedPlatform = AUTO_PLATFORM_VALUE;
+      return;
+    }
+    populatePlatformPickerOptions();
+    await syncPlatformSelection();
+  }
+  function bindPlatformPicker() {
     platformSelect.addEventListener("change", async (event) => {
-      selectedPlatform = event.target.value;
-      await browser.storage.local.set({ [PLATFORM_STORAGE_KEY]: selectedPlatform });
+      const nextPlatform = event.target.value;
+      if (!availablePlatforms.includes(nextPlatform))
+        return;
+      selectedPlatform = nextPlatform;
+      await browser.storage.local.set({
+        [PLATFORM_STORAGE_KEY]: selectedPlatform
+      });
       renderVersionTable();
     });
   }
   async function loadVersions() {
-    const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+    const tabs = await browser.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    });
     const tab = tabs[0];
     if (!tab?.url)
       return;
@@ -322,7 +394,12 @@
           {
             pageNumber: 1,
             pageSize: 1,
-            criteria: [{ filterType: 7, value: `${author}.${packageName}` }]
+            criteria: [
+              {
+                filterType: 7,
+                value: `${author}.${packageName}`
+              }
+            ]
           }
         ],
         assetTypes: [],
@@ -334,10 +411,11 @@
       return;
     const json = await response.json();
     releaseRows = json.results[0].extensions[0].versions || [];
+    await setupPlatformPicker();
     renderVersionTable();
   }
   async function init() {
-    await setupPlatformPicker();
+    bindPlatformPicker();
     await loadVersions();
   }
   init();
