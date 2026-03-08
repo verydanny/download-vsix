@@ -71,11 +71,6 @@ const OS_PREFIX_MAP: Record<string, string> = {
 }
 
 function detectArch(osPrefix: string): "arm64" | "x64" {
-    const uad = (navigator as any).userAgentData
-    if (uad?.architecture) {
-        return /arm/i.test(uad.architecture) ? "arm64" : "x64"
-    }
-
     const ua = navigator.userAgent
     if (/aarch64|arm64/i.test(ua)) return "arm64"
     if (/WOW64|Win64|x86_64|x86-64|x64/i.test(ua)) return "x64"
@@ -85,10 +80,18 @@ function detectArch(osPrefix: string): "arm64" | "x64" {
             const canvas = document.createElement("canvas")
             const gl = canvas.getContext("webgl")
             if (gl) {
-                const dbg = gl.getExtension("WEBGL_debug_renderer_info")
-                if (dbg) {
+                if ("RENDERER" in gl) {
+                    const renderer = gl.getParameter(gl.RENDERER) as string
+                    if (/Apple M\d|Apple GPU/i.test(renderer)) return "arm64"
+                }
+
+                const dbg_DEPRECATED = gl.getExtension(
+                    "WEBGL_debug_renderer_info",
+                )
+
+                if (dbg_DEPRECATED) {
                     const renderer = gl.getParameter(
-                        dbg.UNMASKED_RENDERER_WEBGL,
+                        dbg_DEPRECATED.UNMASKED_RENDERER_WEBGL,
                     ) as string
                     if (/Apple M\d|Apple GPU/i.test(renderer)) return "arm64"
                 }

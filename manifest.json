@@ -2,7 +2,7 @@
     "description": "Simple browser extension that adds a page action to download `.vsix` files from the Visual Studio Marketplace, including older versions.",
     "manifest_version": 2,
     "name": "Download .vsix",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "homepage_url": "https://github.com/verydanny/download-vsix",
     "icons": {
         "48": "icons/dl-vsix-48.png"

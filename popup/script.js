@@ -181,10 +181,6 @@
     ChromeOS: "linux"
   };
   function detectArch(osPrefix) {
-    const uad = navigator.userAgentData;
-    if (uad?.architecture) {
-      return /arm/i.test(uad.architecture) ? "arm64" : "x64";
-    }
     const ua = navigator.userAgent;
     if (/aarch64|arm64/i.test(ua))
       return "arm64";
@@ -195,9 +191,14 @@
         const canvas = document.createElement("canvas");
         const gl = canvas.getContext("webgl");
         if (gl) {
-          const dbg = gl.getExtension("WEBGL_debug_renderer_info");
-          if (dbg) {
-            const renderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+          if ("RENDERER" in gl) {
+            const renderer = gl.getParameter(gl.RENDERER);
+            if (/Apple M\d|Apple GPU/i.test(renderer))
+              return "arm64";
+          }
+          const dbg_DEPRECATED = gl.getExtension("WEBGL_debug_renderer_info");
+          if (dbg_DEPRECATED) {
+            const renderer = gl.getParameter(dbg_DEPRECATED.UNMASKED_RENDERER_WEBGL);
             if (/Apple M\d|Apple GPU/i.test(renderer))
               return "arm64";
           }
